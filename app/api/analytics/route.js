@@ -4,7 +4,7 @@ import axios from 'axios';
 
 export async function GET() {
   try {
-    const response = await axios.get('https://epilepsy-form-service.onrender.com/api/v1/heatmap');
+    const response = await axios.get('https://epilepsy-pa0n.onrender.com/api/v1/heatmap');
     return NextResponse.json(response.data);
   } catch (error) {
     console.error('Proxy error:', error);

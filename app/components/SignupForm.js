@@ -9,7 +9,7 @@ export default function SignupForm() {
   const router = useRouter()
   const [formData, setFormData] = useState({
     name: "",
-    age: "",
+    // age: "",
     gender: "",
     mobile: "",
     email: "",
@@ -29,15 +29,15 @@ export default function SignupForm() {
       newErrors.name = "Name is required"
     }
 
-    // Age validation
-    if (!formData.age) {
-      newErrors.age = "Age is required"
-    } else {
-      const age = Number.parseInt(formData.age)
-      if (isNaN(age) || age < 1 || age > 120) {
-        newErrors.age = "Age must be a number between 1 and 120"
-      }
-    }
+    // // Age validation
+    // if (!formData.age) {
+    //   newErrors.age = "Age is required"
+    // } else {
+    //   const age = Number.parseInt(formData.age)
+    //   if (isNaN(age) || age < 1 || age > 120) {
+    //     newErrors.age = "Age must be a number between 1 and 120"
+    //   }
+    // }
 
     // Gender validation
     if (!formData.gender) {
@@ -61,8 +61,8 @@ export default function SignupForm() {
     // Password validation
     if (!formData.password) {
       newErrors.password = "Password is required"
-    } else if (formData.password.length < 8) {
-      newErrors.password = "Password must be at least 8 characters long"
+    } else if (formData.password.length < 2) {
+      newErrors.password = "Password must be at least 2 characters long"
     } else if (!/^(?=.*[a-zA-Z])(?=.*\d)/.test(formData.password)) {
       newErrors.password = "Password must be alphanumeric"
     }
@@ -168,7 +168,7 @@ export default function SignupForm() {
       </div>
 
       {/* Age */}
-      <div>
+      {/* <div>
         <label htmlFor="age" className="block text-sm font-medium text-gray-700 mb-1">
           Age *
         </label>
@@ -186,7 +186,7 @@ export default function SignupForm() {
           max="120"
         />
         {errors.age && <p className="text-red-500 text-sm mt-1">{errors.age}</p>}
-      </div>
+      </div> */}
 
       {/* Gender */}
       <div>

@@ -1,36 +1,40 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState } from 'react';
-import jwtDecode from 'jwt-decode';
+import { createContext, useContext, useState, useEffect } from 'react';
+import {jwtDecode} from 'jwt-decode';
 
 const UserContext = createContext();
 
-export const UserProvider = ({ children }) => {
-  const [user, setUser] = useState(null);       // full decoded user
-  const [userRole, setUserRole] = useState(null); // only the role string
+export function UserProvider({ children }) {
+  const [userRole, setUserRole] = useState(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    // Get token from localStorage or cookies
-    const token = localStorage.getItem('token'); // adjust this if you're using cookies instead
-
+    const token = localStorage.getItem('token');
     if (token) {
       try {
         const decoded = jwtDecode(token);
-        setUser(decoded);
-        setUserRole(decoded?.role); // assuming JWT payload has 'role' field
+        setUserRole(decoded.role);
+        setIsAuthenticated(true);
       } catch (error) {
-        console.error('Invalid JWT token', error);
-        setUser(null);
+        console.error('Error decoding token:', error);
         setUserRole(null);
+        setIsAuthenticated(false);
       }
     }
   }, []);
 
   return (
-    <UserContext.Provider value={{ user, userRole, setUser }}>
+    <UserContext.Provider value={{ userRole, setUserRole, isAuthenticated, setIsAuthenticated }}>
       {children}
     </UserContext.Provider>
   );
-};
+}
 
-export const useUser = () => useContext(UserContext);
+export function useUser() {
+  const context = useContext(UserContext);
+  if (context === undefined) {
+    throw new Error('useUser must be used within a UserProvider');
+  }
+  return context;
+} 

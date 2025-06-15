@@ -1,12 +1,13 @@
 "use client"
 
 import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { useState } from "react"
+import { usePathname, useRouter } from "next/navigation"
+import { useState, useEffect } from "react"
 import { useUser } from "../context/UserContext"
 
 export default function Header() {
   const pathname = usePathname()
+  const router = useRouter()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const { userRole, isAuthenticated } = useUser()
 
@@ -19,10 +20,18 @@ export default function Header() {
   const authenticatedNavLinks = [
     { href: "/", label: "Home" },
     { href: userRole ? `/dashboard/${userRole}` : "/dashboard", label: "Dashboard" },
-    { href: "/list", label: "List" },
+    { href: "/analyticspage", label: "Analytics" },
   ]
 
   const navLinks = isAuthenticated ? authenticatedNavLinks : publicNavLinks
+
+  const handleNavigation = (href) => {
+    if (href.includes('/dashboard') && !userRole) {
+      router.push('/auth')
+      return
+    }
+    router.push(href)
+  }
 
   return (
     <header className="bg-white shadow-sm border-b">
@@ -39,6 +48,10 @@ export default function Header() {
               <Link
                 key={link.href}
                 href={link.href}
+                onClick={(e) => {
+                  e.preventDefault()
+                  handleNavigation(link.href)
+                }}
                 className={`text-sm font-medium transition-colors hover:text-blue-600 ${
                   pathname === link.href ? "text-blue-600" : "text-gray-700"
                 }`}
@@ -67,10 +80,14 @@ export default function Header() {
                 <Link
                   key={link.href}
                   href={link.href}
+                  onClick={(e) => {
+                    e.preventDefault()
+                    handleNavigation(link.href)
+                    setIsMenuOpen(false)
+                  }}
                   className={`px-3 py-2 text-sm font-medium rounded-md transition-colors hover:text-blue-600 hover:bg-gray-100 ${
                     pathname === link.href ? "text-blue-600 bg-blue-50" : "text-gray-700"
                   }`}
-                  onClick={() => setIsMenuOpen(false)}
                 >
                   {link.label}
                 </Link>
