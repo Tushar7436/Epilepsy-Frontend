@@ -3,11 +3,10 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
-import { useSignup } from "@/hooks/useSignup"
+import { signup } from "@/lib/services/authServices"
 
 export default function SignupForm() {
   const router = useRouter()
-  const { handleSignup, loading, error: signupError } = useSignup()
   const [formData, setFormData] = useState({
     name: "",
     age: "",
@@ -17,6 +16,7 @@ export default function SignupForm() {
     password: "",
     role: "",
     ashaId: "",
+    docId: "",
   })
   const [errors, setErrors] = useState({})
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -80,6 +80,15 @@ export default function SignupForm() {
         newErrors.ashaId = "ASHA ID must be exactly 6 digits"
       }
     }
+    
+    // Doctor ID validation - only required for doctors
+    if (formData.role === "doctor") {
+      if (!formData.docId) {
+        newErrors.docId = "Doctor ID is required for doctors"
+      } else if (!/^\d{6}$/.test(formData.docId)) {
+        newErrors.docId = "Doctor ID must be exactly 6 digits"
+      }
+    }
 
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
@@ -95,57 +104,21 @@ export default function SignupForm() {
     setIsSubmitting(true)
 
     try {
-      // Use the useSignup hook for ASHA workers
-      if (formData.role === "asha-worker") {
-        const result = await handleSignup(formData)
-        
-        if (result.success) {
-          // Store the token and user data
-          localStorage.setItem('token', result.data.token)
-          localStorage.setItem('user', JSON.stringify(result.data.user))
+      const response = await signup(formData)
 
-          // Show success toast
-          toast.success("Account created successfully!")
-
-          // Redirect to home page
-          router.push("/")
-        } else {
-          // Show error toast
-          toast.error(result.error || "Failed to create account. Please try again.")
-          setErrors({
-            submit: result.error || "Failed to create account. Please try again."
-          })
-        }
-      } else {
-        // Handle other roles (doctor, patient) with existing logic
-        const response = await new Promise((resolve, reject) => {
-          setTimeout(() => {
-            resolve({
-              token: "mock-token-123",
-              user: {
-                id: "123",
-                name: formData.name,
-                role: formData.role,
-                email: formData.email,
-                ashaId: formData.ashaId
-              }
-            })
-          }, 1000)
-        })
-
-        // Store the token and user data
+      if (response.success) {
         localStorage.setItem('token', response.token)
         localStorage.setItem('user', JSON.stringify(response.user))
-
-        // Show success toast
         toast.success("Account created successfully!")
-
-        // Redirect to home page
         router.push("/")
+      } else {
+        toast.error(response.error || "Failed to create account. Please try again.")
+        setErrors({
+          submit: response.error || "Failed to create account. Please try again."
+        })
       }
     } catch (error) {
       console.error("Signup error:", error)
-      // Show error toast
       toast.error(error.message || "Failed to create account. Please try again.")
       setErrors({
         submit: error.message || "Failed to create account. Please try again."
@@ -337,6 +310,29 @@ export default function SignupForm() {
             pattern="\d{6}"
           />
           {errors.ashaId && <p className="text-red-500 text-sm mt-1">{errors.ashaId}</p>}
+        </div>
+      )}
+
+      {/* Doctor ID - Only show for doctors */}
+      {formData.role === "doctor" && (
+        <div>
+          <label htmlFor="docId" className="block text-sm font-medium text-gray-700 mb-1">
+            Doctor ID *
+          </label>
+          <input
+            type="text"
+            id="docId"
+            name="docId"
+            value={formData.docId}
+            onChange={handleChange}
+            className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+              errors.docId ? "border-red-500" : "border-gray-300"
+            }`}
+            placeholder="Enter 6-digit Doctor ID"
+            maxLength="6"
+            pattern="\d{6}"
+          />
+          {errors.docId && <p className="text-red-500 text-sm mt-1">{errors.docId}</p>}
         </div>
       )}
 

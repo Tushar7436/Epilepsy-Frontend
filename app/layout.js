@@ -2,6 +2,7 @@ import { Inter } from "next/font/google"
 import "./globals.css"
 import Header from "./components/Header"
 import { Toaster } from "sonner"
+import { UserProvider } from "./context/UserContext"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -15,9 +16,11 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={inter.className}>
-        <Header />
-        <main className="min-h-screen">{children}</main>
-        <Toaster richColors position="top-center" />
+        <UserProvider>
+          <Header />
+          <main className="min-h-screen">{children}</main>
+          <Toaster richColors position="top-center" />
+        </UserProvider>
       </body>
     </html>
   )

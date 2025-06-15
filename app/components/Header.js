@@ -2,18 +2,13 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { useState, useEffect } from "react"
+import { useState } from "react"
+import { useUser } from "../context/UserContext"
 
 export default function Header() {
   const pathname = usePathname()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
-
-  useEffect(() => {
-    // Check if user is authenticated (you can modify this based on your auth implementation)
-    const token = localStorage.getItem('token')
-    setIsAuthenticated(!!token)
-  }, [])
+  const { userRole, isAuthenticated } = useUser()
 
   const publicNavLinks = [
     { href: "/", label: "Home" },
@@ -23,7 +18,7 @@ export default function Header() {
 
   const authenticatedNavLinks = [
     { href: "/", label: "Home" },
-    { href: "/dashboard", label: "Dashboard" },
+    { href: userRole ? `/dashboard/${userRole}` : "/dashboard", label: "Dashboard" },
     { href: "/list", label: "List" },
   ]
 

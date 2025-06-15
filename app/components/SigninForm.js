@@ -2,13 +2,13 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import { signin } from "@/lib/services/authServices"
 
 export default function SigninForm() {
   const router = useRouter()
   const [formData, setFormData] = useState({
-    emailOrId: "",
+    email: "",
     password: "",
-    role: "",
   })
   const [errors, setErrors] = useState({})
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -16,19 +16,16 @@ export default function SigninForm() {
   const validateForm = () => {
     const newErrors = {}
 
-    // Email/ID validation
-    if (!formData.emailOrId.trim()) {
-      newErrors.emailOrId = "Email or ID is required"
+    // Email validation
+    if (!formData.email) {
+      newErrors.email = "email is required"
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = "Please enter a valid email address"
     }
 
     // Password validation
     if (!formData.password) {
       newErrors.password = "Password is required"
-    }
-
-    // Role validation
-    if (!formData.role) {
-      newErrors.role = "Role is required"
     }
 
     setErrors(newErrors)
@@ -45,26 +42,23 @@ export default function SigninForm() {
     setIsSubmitting(true)
 
     try {
-      // Simulate API call - Replace with your actual API call
-      const response = await new Promise((resolve) => {
-        setTimeout(() => {
-          resolve({
-            token: "mock-token-123",
-            user: {
-              id: "123",
-              role: formData.role,
-              email: formData.emailOrId
-            }
-          })
-        }, 1000)
+      const response = await signin({
+        email: formData.email,
+        password: formData.password
       })
 
-      // Store the token and user data
-      localStorage.setItem('token', response.token)
-      localStorage.setItem('user', JSON.stringify(response.user))
+      if (response.success) {
+        // Store the token and user data
+        localStorage.setItem('token', response.token)
+        localStorage.setItem('user', JSON.stringify(response.user))
 
-      // Redirect to home page
-      router.push("/")
+        // Redirect to home page
+        router.push("/")
+      } else {
+        setErrors({
+          submit: response.error || "Failed to sign in. Please try again."
+        })
+      }
     } catch (error) {
       console.error("Signin error:", error)
       setErrors({
@@ -95,23 +89,23 @@ export default function SigninForm() {
     <form onSubmit={handleSubmit} className="space-y-4">
       <h2 className="text-2xl font-bold text-center text-gray-900 mb-6">Welcome Back</h2>
 
-      {/* Email or ID */}
+      {/* email*/}
       <div>
-        <label htmlFor="emailOrId" className="block text-sm font-medium text-gray-700 mb-1">
-          Email or ID *
+        <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+          email *
         </label>
         <input
           type="text"
-          id="emailOrId"
-          name="emailOrId"
-          value={formData.emailOrId}
+          id="email"
+          name="email"
+          value={formData.email}
           onChange={handleChange}
           className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-            errors.emailOrId ? "border-red-500" : "border-gray-300"
+            errors.email ? "border-red-500" : "border-gray-300"
           }`}
           placeholder="Enter your email or ID"
         />
-        {errors.emailOrId && <p className="text-red-500 text-sm mt-1">{errors.emailOrId}</p>}
+        {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
       </div>
 
       {/* Password */}
@@ -133,28 +127,6 @@ export default function SigninForm() {
         {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
       </div>
 
-      {/* Role */}
-      <div>
-        <label htmlFor="role" className="block text-sm font-medium text-gray-700 mb-1">
-          Role *
-        </label>
-        <select
-          id="role"
-          name="role"
-          value={formData.role}
-          onChange={handleChange}
-          className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-            errors.role ? "border-red-500" : "border-gray-300"
-          }`}
-        >
-          <option value="">Select Role</option>
-          <option value="doctor">Doctor</option>
-          <option value="asha-worker">ASHA Worker</option>
-          <option value="patient">Patient</option>
-        </select>
-        {errors.role && <p className="text-red-500 text-sm mt-1">{errors.role}</p>}
-      </div>
-
       {/* Submit Button */}
       <button
         type="submit"
@@ -163,6 +135,11 @@ export default function SigninForm() {
       >
         {isSubmitting ? "Signing In..." : "Sign In"}
       </button>
+
+      {/* Error Message */}
+      {errors.submit && (
+        <p className="text-red-500 text-sm text-center">{errors.submit}</p>
+      )}
 
       {/* Forgot Password Link */}
       <div className="text-center">

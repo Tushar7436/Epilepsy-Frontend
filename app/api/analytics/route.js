@@ -1,0 +1,13 @@
+// app/api/analytics/route.js
+import { NextResponse } from 'next/server';
+import axios from 'axios';
+
+export async function GET() {
+  try {
+    const response = await axios.get('https://epilepsy-form-service.onrender.com/api/v1/heatmap');
+    return NextResponse.json(response.data);
+  } catch (error) {
+    console.error('Proxy error:', error);
+    return NextResponse.json({ error: 'Proxy failed' }, { status: 500 });
+  }
+}
