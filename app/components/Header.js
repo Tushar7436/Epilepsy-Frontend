@@ -39,7 +39,7 @@ export default function Header() {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link href="/" className="text-xl font-bold text-gray-900">
-            ModernAuth
+            NeuroCheck
           </Link>
 
           {/* Desktop Navigation */}

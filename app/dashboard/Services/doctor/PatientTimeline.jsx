@@ -12,34 +12,78 @@ export default function PatientTimeline() {
   useEffect(() => {
     const fetchTimelineData = async () => {
       try {
+        console.log('Fetching timeline data...');
         const token = localStorage.getItem('token');
-        const response = await fetch(`https://epilepsy-pa0n.onrender.com/api/v1/checklists/patient/1`, {
+        console.log('Token:', token);
+        
+        // Using the endpoint that returns patient history records based on console output
+        const response = await fetch(`https://epilepsy-pa0n.onrender.com/api/v1/checklists/patients/1`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
           }
         });
 
+        console.log('Response status:', response.status);
+        const result = await response.json();
+        console.log('API Response:', result);
+
         if (!response.ok) {
-          throw new Error('Failed to fetch timeline data');
+          throw new Error(result.message || 'Failed to fetch timeline data');
         }
 
-        const result = await response.json();
         if (result.success) {
-          setTimelineData(result.data);
+          // Transform the patient history data into timeline format
+          const transformedData = result.data.flatMap(item => {
+            const events = [];
+
+            if (item.first_seizure_date) {
+              events.push({
+                id: `${item.id}-first-seizure`,
+                type: 'First Seizure',
+                date: item.first_seizure_date,
+                details: `Patient's first recorded seizure.`,
+              });
+            }
+
+            if (item.most_recent_seizure_date) {
+              events.push({
+                id: `${item.id}-most-recent-seizure`,
+                type: 'Most Recent Seizure',
+                date: item.most_recent_seizure_date,
+                details: `Patient's most recent recorded seizure.`,
+              });
+            }
+
+            if (item.submission_date) {
+              events.push({
+                id: `${item.id}-submission`,
+                type: 'Record Submission',
+                date: item.submission_date,
+                details: `A record was submitted for patient ID ${item.patient_id}.`,
+              });
+            }
+            return events;
+          }).sort((a, b) => new Date(a.date) - new Date(b.date)); // Sort by date
+
+          setTimelineData(transformedData);
         } else {
-          throw new Error('Failed to load timeline data');
+          throw new Error(result.message || 'Failed to load timeline data');
         }
       } catch (error) {
         console.error('Error fetching timeline data:', error);
-        setError('Failed to load timeline data. Please try again.');
+        setError(error.message || 'Failed to load timeline data. Please try again.');
       } finally {
         setLoading(false);
       }
     };
 
     if (user?.id) {
+      console.log('User ID:', user.id);
       fetchTimelineData();
+    } else {
+      console.log('No user ID found');
+      setLoading(false);
     }
   }, [user]);
 
@@ -85,7 +129,7 @@ export default function PatientTimeline() {
           {/* Timeline items */}
           <div className="space-y-8">
             {timelineData.map((item, index) => (
-              <div key={index} className="relative pl-12">
+              <div key={item.id || index} className="relative pl-12">
                 {/* Timeline dot */}
                 <div className="absolute left-0 w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center">
                   <div className="w-4 h-4 rounded-full bg-white"></div>
@@ -100,75 +144,10 @@ export default function PatientTimeline() {
                     </span>
                   </div>
 
-                  {/* Details based on type */}
-                  {item.type === 'Medication' && (
-                    <div className="space-y-2">
-                      <p className="text-gray-700">{item.medication_name}</p>
-                      <p className="text-sm text-gray-500">Dosage: {item.dosage}</p>
-                      <p className="text-sm text-gray-500">Duration: {item.duration}</p>
-                      {item.notes && (
-                        <p className="text-sm text-gray-600 mt-2">{item.notes}</p>
-                      )}
-                    </div>
-                  )}
-
-                  {item.type === 'Visit' && (
-                    <div className="space-y-2">
-                      <p className="text-gray-700">Doctor: {item.doctor_name}</p>
-                      <p className="text-sm text-gray-500">Purpose: {item.purpose}</p>
-                      {item.diagnosis && (
-                        <p className="text-sm text-gray-600 mt-2">Diagnosis: {item.diagnosis}</p>
-                      )}
-                      {item.notes && (
-                        <p className="text-sm text-gray-600 mt-2">{item.notes}</p>
-                      )}
-                    </div>
-                  )}
-
-                  {item.type === 'Test' && (
-                    <div className="space-y-2">
-                      <p className="text-gray-700">Test: {item.test_name}</p>
-                      <p className="text-sm text-gray-500">Location: {item.location}</p>
-                      {item.results && (
-                        <p className="text-sm text-gray-600 mt-2">Results: {item.results}</p>
-                      )}
-                    </div>
-                  )}
-
-                  {item.type === 'Seizure' && (
-                    <div className="space-y-2">
-                      <p className="text-gray-700">Seizure Episode</p>
-                      <p className="text-sm text-gray-500">Duration: {item.duration}</p>
-                      <p className="text-sm text-gray-500">Type: {item.seizure_type}</p>
-                      <p className="text-sm text-gray-500">Severity: {item.severity}</p>
-                      {item.triggers && (
-                        <p className="text-sm text-gray-500">Triggers: {item.triggers}</p>
-                      )}
-                      {item.notes && (
-                        <p className="text-sm text-gray-600 mt-2">{item.notes}</p>
-                      )}
-                    </div>
-                  )}
-
-                  {/* Attachments if any */}
-                  {item.attachments && item.attachments.length > 0 && (
-                    <div className="mt-4 pt-4 border-t">
-                      <p className="text-sm font-medium text-gray-700 mb-2">Attachments:</p>
-                      <div className="flex flex-wrap gap-2">
-                        {item.attachments.map((attachment, idx) => (
-                          <a
-                            key={idx}
-                            href={attachment.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-gray-100 text-gray-700 hover:bg-gray-200"
-                          >
-                            {attachment.name}
-                          </a>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+                  {/* Details based on transformed data */}
+                  <div className="space-y-2">
+                    <p className="text-gray-700">{item.details}</p>
+                  </div>
                 </div>
               </div>
             ))}
