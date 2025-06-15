@@ -44,12 +44,35 @@ export default function SigninForm() {
 
     setIsSubmitting(true)
 
-    // Simulate API call
-    setTimeout(() => {
-      console.log("Signin data:", formData)
+    try {
+      // Simulate API call - Replace with your actual API call
+      const response = await new Promise((resolve) => {
+        setTimeout(() => {
+          resolve({
+            token: "mock-token-123",
+            user: {
+              id: "123",
+              role: formData.role,
+              email: formData.emailOrId
+            }
+          })
+        }, 1000)
+      })
+
+      // Store the token and user data
+      localStorage.setItem('token', response.token)
+      localStorage.setItem('user', JSON.stringify(response.user))
+
+      // Redirect to home page
+      router.push("/")
+    } catch (error) {
+      console.error("Signin error:", error)
+      setErrors({
+        submit: "Failed to sign in. Please try again."
+      })
+    } finally {
       setIsSubmitting(false)
-      router.push("/dashboard")
-    }, 1000)
+    }
   }
 
   const handleChange = (e) => {

@@ -2,9 +2,12 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import { toast } from "sonner"
+import { useSignup } from "@/hooks/useSignup"
 
 export default function SignupForm() {
   const router = useRouter()
+  const { handleSignup, loading, error: signupError } = useSignup()
   const [formData, setFormData] = useState({
     name: "",
     age: "",
@@ -13,6 +16,7 @@ export default function SignupForm() {
     email: "",
     password: "",
     role: "",
+    ashaId: "",
   })
   const [errors, setErrors] = useState({})
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -68,6 +72,15 @@ export default function SignupForm() {
       newErrors.role = "Role is required"
     }
 
+    // ASHA ID validation - only required for ASHA workers
+    if (formData.role === "asha-worker") {
+      if (!formData.ashaId) {
+        newErrors.ashaId = "ASHA ID is required for ASHA workers"
+      } else if (!/^\d{6}$/.test(formData.ashaId)) {
+        newErrors.ashaId = "ASHA ID must be exactly 6 digits"
+      }
+    }
+
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
@@ -81,12 +94,65 @@ export default function SignupForm() {
 
     setIsSubmitting(true)
 
-    // Simulate API call
-    setTimeout(() => {
-      console.log("Signup data:", formData)
+    try {
+      // Use the useSignup hook for ASHA workers
+      if (formData.role === "asha-worker") {
+        const result = await handleSignup(formData)
+        
+        if (result.success) {
+          // Store the token and user data
+          localStorage.setItem('token', result.data.token)
+          localStorage.setItem('user', JSON.stringify(result.data.user))
+
+          // Show success toast
+          toast.success("Account created successfully!")
+
+          // Redirect to home page
+          router.push("/")
+        } else {
+          // Show error toast
+          toast.error(result.error || "Failed to create account. Please try again.")
+          setErrors({
+            submit: result.error || "Failed to create account. Please try again."
+          })
+        }
+      } else {
+        // Handle other roles (doctor, patient) with existing logic
+        const response = await new Promise((resolve, reject) => {
+          setTimeout(() => {
+            resolve({
+              token: "mock-token-123",
+              user: {
+                id: "123",
+                name: formData.name,
+                role: formData.role,
+                email: formData.email,
+                ashaId: formData.ashaId
+              }
+            })
+          }, 1000)
+        })
+
+        // Store the token and user data
+        localStorage.setItem('token', response.token)
+        localStorage.setItem('user', JSON.stringify(response.user))
+
+        // Show success toast
+        toast.success("Account created successfully!")
+
+        // Redirect to home page
+        router.push("/")
+      }
+    } catch (error) {
+      console.error("Signup error:", error)
+      // Show error toast
+      toast.error(error.message || "Failed to create account. Please try again.")
+      setErrors({
+        submit: error.message || "Failed to create account. Please try again."
+      })
+    } finally {
       setIsSubmitting(false)
-      router.push("/dashboard")
-    }, 1000)
+    }
   }
 
   const handleChange = (e) => {
@@ -251,14 +317,42 @@ export default function SignupForm() {
         {errors.role && <p className="text-red-500 text-sm mt-1">{errors.role}</p>}
       </div>
 
+      {/* ASHA ID - Only show for ASHA workers */}
+      {formData.role === "asha-worker" && (
+        <div>
+          <label htmlFor="ashaId" className="block text-sm font-medium text-gray-700 mb-1">
+            ASHA ID *
+          </label>
+          <input
+            type="text"
+            id="ashaId"
+            name="ashaId"
+            value={formData.ashaId}
+            onChange={handleChange}
+            className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+              errors.ashaId ? "border-red-500" : "border-gray-300"
+            }`}
+            placeholder="Enter 6-digit ASHA ID"
+            maxLength="6"
+            pattern="\d{6}"
+          />
+          {errors.ashaId && <p className="text-red-500 text-sm mt-1">{errors.ashaId}</p>}
+        </div>
+      )}
+
       {/* Submit Button */}
       <button
         type="submit"
         disabled={isSubmitting}
         className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
       >
-        {isSubmitting ? "Creating Account..." : "Sign Up"}
+        {isSubmitting ? "Creating Account..." : "Create Account"}
       </button>
+
+      {/* Error message for submission errors */}
+      {errors.submit && (
+        <p className="text-red-500 text-sm text-center">{errors.submit}</p>
+      )}
     </form>
   )
 }
