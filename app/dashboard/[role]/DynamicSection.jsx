@@ -43,16 +43,16 @@ export default function DynamicSection({ role, activeService }) {
 
   if (!activeService) {
     return (
-      <div className="flex items-center justify-center h-full">
-        <p className="text-gray-500">Select a service from the sidebar</p>
+      <div className="flex items-center justify-center min-h-[calc(100vh-4rem)] p-4">
+        <p className="text-gray-500 text-center">Select a service from the menu</p>
       </div>
     );
   }
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-full">
-        <div className="animate-pulse">
+      <div className="flex items-center justify-center min-h-[calc(100vh-4rem)] p-4">
+        <div className="animate-pulse w-full max-w-4xl">
           <div className="h-8 bg-gray-200 rounded w-1/4 mb-4"></div>
           <div className="space-y-3">
             <div className="h-4 bg-gray-200 rounded w-3/4"></div>
@@ -65,8 +65,8 @@ export default function DynamicSection({ role, activeService }) {
 
   if (error) {
     return (
-      <div className="flex items-center justify-center h-full">
-        <div className="text-center">
+      <div className="flex items-center justify-center min-h-[calc(100vh-4rem)] p-4">
+        <div className="text-center max-w-md">
           <p className="text-red-500 mb-2">{error}</p>
           <p className="text-sm text-gray-500">Please try selecting the service again</p>
         </div>
@@ -75,7 +75,7 @@ export default function DynamicSection({ role, activeService }) {
   }
 
   return (
-    <div className="p-6">
+    <div className="w-full min-h-[calc(100vh-4rem)] bg-gray-50 pb-16 md:pb-0">
       {ServiceComponent && <ServiceComponent />}
     </div>
   );

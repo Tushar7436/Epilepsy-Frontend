@@ -23,6 +23,10 @@ export default function Header() {
     { href: "/analyticspage", label: "Analytics" },
   ]
 
+  useEffect(() => {
+    console.log("Header re-rendered: Authenticated =", isAuthenticated, "Role =", userRole);
+  }, [isAuthenticated, userRole]);
+
   const navLinks = isAuthenticated ? authenticatedNavLinks : publicNavLinks
 
   const handleNavigation = (href) => {

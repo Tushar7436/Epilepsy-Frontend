@@ -80,17 +80,17 @@ export default function AnalyticsPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
         <div className="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
           <h3 className="text-xl font-semibold mb-3">Total Cases</h3>
-          <p className="text-3xl font-bold text-blue-600 mb-2">2,400</p>
+          <p className="text-3xl font-bold text-blue-600 mb-2">10-12 million</p>
           <p className="text-gray-600">Active epilepsy cases across India</p>
         </div>
         <div className="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
           <h3 className="text-xl font-semibold mb-3">Active Neurosurgeons</h3>
-          <p className="text-3xl font-bold text-green-600 mb-2">58</p>
+          <p className="text-3xl font-bold text-green-600 mb-2">2500</p>
           <p className="text-gray-600">Specialized healthcare professionals</p>
         </div>
         <div className="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
-          <h3 className="text-xl font-semibold mb-3">Average Efficiency</h3>
-          <p className="text-3xl font-bold text-purple-600 mb-2">85%</p>
+          <h3 className="text-xl font-semibold mb-3">Average Sucess rate</h3>
+          <p className="text-3xl font-bold text-purple-600 mb-2">10-20%</p>
           <p className="text-gray-600">Overall treatment success rate</p>
         </div>
       </div>

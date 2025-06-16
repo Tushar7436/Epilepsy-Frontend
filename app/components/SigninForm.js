@@ -3,6 +3,8 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { signin } from "@/lib/services/authServices"
+import { useUser } from "@/app/context/UserContext";
+import { jwtDecode } from "jwt-decode";
 
 export default function SigninForm() {
   const router = useRouter()
@@ -12,6 +14,7 @@ export default function SigninForm() {
   })
   const [errors, setErrors] = useState({})
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const { setUserRole, setIsAuthenticated } = useUser();
 
   const validateForm = () => {
     const newErrors = {}
@@ -51,6 +54,12 @@ export default function SigninForm() {
         // Store the token and user data
         localStorage.setItem('token', response.token)
         localStorage.setItem('user', JSON.stringify(response.user))
+
+        setIsAuthenticated(true);
+
+        const decoded = jwtDecode(response.token);
+        setUserRole(decoded.role);
+
 
         // Redirect to home page
         router.push("/")

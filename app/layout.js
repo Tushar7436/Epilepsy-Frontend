@@ -3,13 +3,13 @@ import "./globals.css"
 import Header from "./components/Header"
 import { Toaster } from "sonner"
 import { UserProvider } from "./context/UserContext"
+import Footer from "./components/Footer"
 
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata = {
-  title: "Modern Auth App",
-  description: "A modern authentication application built with Next.js",
-    generator: 'v0.dev'
+  title: "Epilepsy Management System",
+  description: "A comprehensive system for managing epilepsy patients and their data"
 }
 
 export default function RootLayout({ children }) {
@@ -18,7 +18,10 @@ export default function RootLayout({ children }) {
       <body className={inter.className}>
         <UserProvider>
           <Header />
-          <main className="min-h-screen">{children}</main>
+          <main className="min-h-screen">
+          {children}
+          <Footer />
+          </main>
           <Toaster richColors position="top-center" />
         </UserProvider>
       </body>

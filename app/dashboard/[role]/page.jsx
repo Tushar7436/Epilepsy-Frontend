@@ -1,6 +1,5 @@
 'use client';
 
-
 import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { jwtDecode } from 'jwt-decode';
@@ -44,10 +43,33 @@ function Page() {
   }
 
   return (
-    <div className="flex h-screen">
-      <Sidebar role={userRole} onSelectService={setActiveService} />
-      <div className="flex-grow p-6">
+    <div className="flex flex-col min-h-screen">
+      {/* Mobile Header */}
+      <header className="md:hidden bg-white shadow-sm p-4">
+        <h1 className="text-xl font-semibold capitalize">{userRole} Dashboard</h1>
+      </header>
+
+      {/* Desktop Sidebar */}
+      <div className="hidden md:flex">
+        <Sidebar 
+          role={userRole} 
+          onSelectService={setActiveService}
+          isMobile={false}
+        />
+      </div>
+
+      {/* Main Content */}
+      <main className="flex-grow bg-gray-50">
         <DynamicSection role={userRole} activeService={activeService} />
+      </main>
+
+      {/* Mobile Bottom Navigation */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg">
+        <Sidebar 
+          role={userRole} 
+          onSelectService={setActiveService}
+          isMobile={true}
+        />
       </div>
     </div>
   );

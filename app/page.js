@@ -10,7 +10,7 @@ export default function Home() {
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-indigo-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
       </div>
 
-      <div className="max-w-4xl mx-auto text-center relative z-10">
+      <div className="mt-6 max-w-4xl mx-auto text-center relative z-10">
         <div className="animate-fade-in-up">
           <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6 bg-clip-text text-transparent bg-gradient-to-r from-teal-600 to-blue-600">
             Epilepsy Services Hub
@@ -46,7 +46,7 @@ export default function Home() {
           </Link>
         </div>
 
-        <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6 animate-fade-in animation-delay-600">
+        <div className="mt-12 mb-6 grid grid-cols-1 md:grid-cols-3 gap-6 animate-fade-in animation-delay-600">
           <div className="p-6 bg-white/80 backdrop-blur-sm rounded-xl shadow-lg hover:shadow-xl transition-shadow">
             <div className="text-teal-600 text-2xl mb-3">🔒</div>
             <h3 className="text-lg font-semibold text-gray-800 mb-2">Secure Platform</h3>
