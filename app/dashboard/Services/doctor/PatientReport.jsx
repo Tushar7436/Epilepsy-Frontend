@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import { endpoints } from '@/app/api/route';
 
 export default function PatientReport() {
     const [patients, setPatients] = useState([]);
@@ -17,7 +18,7 @@ export default function PatientReport() {
         const fetchPatients = async () => {
             try {
                 const token = localStorage.getItem('token');
-                const response = await axios.get('https://epilepsy-pa0n.onrender.com/api/v1/checklists/patient/1', {
+                const response = await axios.get(endpoints.patientList, {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json'
@@ -96,7 +97,7 @@ export default function PatientReport() {
         setSaving(true);
         try {
             const token = localStorage.getItem('token');
-            await axios.post('https://epilepsy-pa0n.onrender.com/api/v1/checklists/report', {
+            await axios.post(endpoints.reportChecklist, {
                 patientId,
                 comments: comments[patientId],
                 checkmarks: checkmarks[patientId]

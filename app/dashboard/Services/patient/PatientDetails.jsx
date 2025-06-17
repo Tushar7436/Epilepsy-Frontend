@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useUser } from '@/app/context/UserContext';
+import { endpoints } from '@/app/api/route';
 
 export default function PatientDetails() {
   const { user } = useUser();
@@ -13,7 +14,7 @@ export default function PatientDetails() {
     const fetchPatientDetails = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await fetch(`https://epilepsy-api-gateway.onrender.com/gatewayApi/api/v1/patients/${user?.id}`, {
+        const response = await fetch(endpoints.patientDetails(user?.id), {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'

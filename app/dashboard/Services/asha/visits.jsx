@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { endpoints } from '@/app/api/route';
 
 export default function CommunityVisits() {
   const [patients, setPatients] = useState([]);
@@ -59,7 +60,7 @@ export default function CommunityVisits() {
     const fetchPatients = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await fetch('https://epilepsy-pa0n.onrender.com/api/v1/checklists/patient/1', {
+        const response = await fetch(endpoints.patientList, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
@@ -120,7 +121,7 @@ export default function CommunityVisits() {
         }
       });
 
-      const response = await fetch('https://epilepsy-pa0n.onrender.com/api/v1/checklists/create', {
+      const response = await fetch(endpoints.createChecklist, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useUser } from '@/app/context/UserContext';
+import { endpoints } from '@/app/api/route';
 
 export default function PatientTimeline() {
   const { user } = useUser();
@@ -13,7 +14,7 @@ export default function PatientTimeline() {
     const fetchTimelineData = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await fetch(`https://epilepsy-api-gateway.onrender.com/gatewayApi/api/v1/patients/${user?.id}/timeline`, {
+        const response = await fetch(endpoints.patientTimelineGateway(user?.id), {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'

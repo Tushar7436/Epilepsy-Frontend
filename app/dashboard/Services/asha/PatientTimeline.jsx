@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo, memo } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { format } from 'date-fns';
+import { endpoints } from '@/app/api/route';
 
 // Memoized Timeline Item Component
 const TimelineItem = memo(({ item, formatDate }) => {
@@ -190,7 +191,7 @@ export default function PatientTimeline() {
         return;
       }
 
-      const response = await fetch(`https://epilepsy-pa0n.onrender.com/api/v1/checklists/patient/${patientId}`, {
+      const response = await fetch(endpoints.patientTimeline(patientId), {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
